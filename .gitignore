@@ -1,0 +1,16 @@
+# Captures and local build products; ignore rules do not untrack existing files.
+*.evt3
+*.raw
+*.pcap
+*.pcapng
+*.test
+coverage.out
+/bin/
+/dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

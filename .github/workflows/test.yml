@@ -1,0 +1,45 @@
+name: Test
+on: [push, pull_request]
+env:
+  GOWORK: "off"
+  IMX636_HARDWARE: "0"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        go: ['1.23.x', 'oldstable', 'stable']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+      - run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev pkg-config
+      - name: Formatting and module integrity
+        run: |
+          test -z "$(gofmt -l .)"
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+          go mod verify
+      - run: go build ./...
+      - run: go test ./...
+      - run: go vet ./...
+      - run: go test -race -tags libusb ./...
+      - run: go vet -tags libusb ./...
+      - run: go build -tags libusb ./...
+      - run: CGO_ENABLED=0 go test ./...
+      - name: Fuzz synthetic inputs
+        if: matrix.go == 'stable'
+        run: |
+          go test ./evt3 -run '^$' -fuzz '^FuzzDecoderChunking$' -fuzztime 10s -parallel 2
+          go test ./internal/hw -run '^$' -fuzz '^FuzzRegisterResponses$' -fuzztime 10s -parallel 2
+      - name: Build portable targets
+        if: matrix.go == 'stable'
+        run: |
+          GOOS=darwin CGO_ENABLED=0 go build ./...
+          GOOS=windows CGO_ENABLED=0 go build ./...

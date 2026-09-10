@@ -1,0 +1,13 @@
+go-imx636
+Copyright 2026 Crosscue Ltd
+
+This product is licensed under the Apache License, Version 2.0.
+See LICENSE.
+
+This product includes software derived from Neuromorphic Drivers:
+  https://github.com/neuromorphicsystems/neuromorphic-drivers
+  Copyright (c) 2020 International Centre for Neuromorphic Systems
+  Licensed under the MIT License.
+
+The complete MIT notice is in docs/NEUROMORPHIC-DRIVERS-LICENSE.
+Further third-party attribution is in THIRD_PARTY_NOTICES.md.
